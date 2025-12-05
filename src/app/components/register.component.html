@@ -1,0 +1,87 @@
+<div class="register-container">
+  <div class="register-card">
+    <h1>Create Account</h1>
+
+    @if (errorMessage()) {
+      <div class="error-banner" role="alert" aria-live="polite">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @if (successMessage()) {
+      <div class="success-banner" role="alert" aria-live="polite">
+        {{ successMessage() }}
+      </div>
+    }
+
+    <form (submit)="onSubmit(); $event.preventDefault()">
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email"
+          [field]="registerForm.email" 
+          autocomplete="email"
+          [attr.aria-invalid]="registerForm.email().touched() && registerForm.email().invalid()"
+          [attr.aria-describedby]="registerForm.email().touched() && registerForm.email().invalid() ? 'email-error' : null"
+        />
+        @if (registerForm.email().touched() && registerForm.email().invalid()) {
+          <span class="error" id="email-error" role="alert">
+            {{ registerForm.email().errors()[0].message }}
+          </span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password"
+          [field]="registerForm.password" 
+          autocomplete="new-password"
+          [attr.aria-invalid]="registerForm.password().touched() && registerForm.password().invalid()"
+          [attr.aria-describedby]="registerForm.password().touched() && registerForm.password().invalid() ? 'password-error' : null"
+        />
+        @if (registerForm.password().touched() && registerForm.password().invalid()) {
+          <span class="error" id="password-error" role="alert">
+            {{ registerForm.password().errors()[0].message }}
+          </span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="confirmPassword">Confirm Password</label>
+        <input 
+          type="password" 
+          id="confirmPassword"
+          [field]="registerForm.confirmPassword" 
+          autocomplete="new-password"
+          [attr.aria-invalid]="registerForm.confirmPassword().touched() && registerForm.confirmPassword().invalid()"
+          [attr.aria-describedby]="registerForm.confirmPassword().touched() && registerForm.confirmPassword().invalid() ? 'confirm-password-error' : null"
+        />
+        @if (registerForm.confirmPassword().touched() && registerForm.confirmPassword().invalid()) {
+          <span class="error" id="confirm-password-error" role="alert">
+            {{ registerForm.confirmPassword().errors()[0].message }}
+          </span>
+        }
+      </div>
+
+      <button 
+        type="submit" 
+        class="submit-btn"
+        [disabled]="registerForm().invalid() || isLoading()"
+        [attr.aria-busy]="isLoading()"
+      >
+        @if (isLoading()) {
+          Creating Account...
+        } @else {
+          Register
+        }
+      </button>
+    </form>
+
+    <p class="login-link">
+      Already have an account? <a routerLink="/login">Login here</a>
+    </p>
+  </div>
+</div>
