@@ -1,21 +1,31 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from './guards/auth.guard';
+import { authGuard, guestGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
 	{
 		path: 'login',
 		canActivate: [guestGuard],
-		loadComponent: () => import('./components/login.component').then((m) => m.LoginComponent),
+		loadComponent: () => import('./features/auth/components/login/login.component').then((m) => m.LoginComponent),
 	},
 	{
 		path: 'register',
 		canActivate: [guestGuard],
-		loadComponent: () => import('./components/register.component').then((m) => m.RegisterComponent),
+		loadComponent: () => import('./features/auth/components/register/register.component').then((m) => m.RegisterComponent),
+	},
+	{
+		path: 'forgot-password',
+		canActivate: [guestGuard],
+		loadComponent: () => import('./features/auth/components/forgot-password/forgot-password.component').then((m) => m.ForgotPasswordComponent),
+	},
+	{
+		path: 'reset-password',
+		canActivate: [guestGuard],
+		loadComponent: () => import('./features/auth/components/reset-password/reset-password.component').then((m) => m.ResetPasswordComponent),
 	},
 	{
 		path: 'dashboard',
 		canActivate: [authGuard],
-		loadComponent: () => import('./components/dashboard.component').then((m) => m.DashboardComponent),
+		loadComponent: () => import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
 	},
 	{
 		path: '',

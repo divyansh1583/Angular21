@@ -1,0 +1,70 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h1>Login</h1>
+
+    <form (submit)="onSubmit(); $event.preventDefault()">
+      @if (errorMessage()) {
+        <div class="error-message" role="alert">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          [field]="loginForm.email"
+          placeholder="your.email@example.com"
+          autocomplete="email"
+          [attr.aria-invalid]="loginForm.email().touched() && loginForm.email().invalid()"
+          [attr.aria-describedby]="loginForm.email().touched() && loginForm.email().invalid() ? 'email-error' : null"
+        />
+        @if (loginForm.email().touched() && loginForm.email().invalid()) {
+          <span class="error" id="email-error" role="alert">
+            {{ loginForm.email().errors()[0].message }}
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          [field]="loginForm.password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          [attr.aria-invalid]="loginForm.password().touched() && loginForm.password().invalid()"
+          [attr.aria-describedby]="loginForm.password().touched() && loginForm.password().invalid() ? 'password-error' : null"
+        />
+        @if (loginForm.password().touched() && loginForm.password().invalid()) {
+          <span class="error" id="password-error" role="alert">
+            {{ loginForm.password().errors()[0].message }}
+          </span>
+        }
+      </div>
+
+      <div class="forgot-password-link">
+        <a routerLink="/forgot-password">Forgot password?</a>
+      </div>
+
+      <button 
+        type="submit" 
+        [disabled]="isLoading() || loginForm().invalid()"
+        class="btn-primary"
+      >
+        @if (isLoading()) {
+          <span>Logging in...</span>
+        } @else {
+          <span>Login</span>
+        }
+      </button>
+
+      <div class="auth-links">
+        <span>Don't have an account?</span>
+        <a routerLink="/register">Register here</a>
+      </div>
+    </form>
+  </div>
+</div>
