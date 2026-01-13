@@ -10,7 +10,7 @@ import type { AuthResponse, LoginRequest, RegisterRequest, User } from '../model
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  private readonly API_URL = 'http://localhost:5066';
+  private readonly API_URL = 'http://localhost:5066/api/auth';
 
   private readonly accessToken = signal<string | null>(this.getStoredToken());
   private readonly currentUser = signal<User | null>(this.getStoredUser());
@@ -25,30 +25,35 @@ export class AuthService {
   }
 
   login(request: LoginRequest) {
-    return this.http.post<AuthResponse>(`${this.API_URL}/login`, request, {
-      params: {
-        useCookies: 'false',
-        useSessionCookies: 'false'
-      }
-    }).pipe(
+    return this.http.post<AuthResponse>(`${this.API_URL}/login`, request).pipe(
       tap((response) => this.handleAuthResponse(response, request.email)),
       catchError(this.handleError)
     );
   }
 
   logout() {
-    this.clearAuth();
-    this.router.navigate(['/login']);
+    return this.http.post(`${this.API_URL}/logout`, {}).pipe(
+      tap(() => {
+        this.clearAuth();
+        this.router.navigate(['/login']);
+      }),
+      catchError((error) => {
+        // Even if the API call fails, clear local auth
+        this.clearAuth();
+        this.router.navigate(['/login']);
+        return throwError(() => error);
+      })
+    );
   }
 
   refreshToken() {
-    const token = this.accessToken();
-    if (!token) {
+    const storedRefreshToken = localStorage.getItem('refresh_token');
+    if (!storedRefreshToken) {
       return throwError(() => new Error('No refresh token available'));
     }
 
     return this.http.post<AuthResponse>(`${this.API_URL}/refresh`, {
-      refreshToken: token,
+      refreshToken: storedRefreshToken,
     }).pipe(
       tap((response) => this.handleAuthResponse(response, this.currentUser()?.email || '')),
       catchError((error) => {
@@ -63,6 +68,7 @@ export class AuthService {
     this.currentUser.set({ email });
     
     localStorage.setItem('access_token', response.accessToken);
+    localStorage.setItem('refresh_token', response.refreshToken);
     localStorage.setItem('user', JSON.stringify({ email }));
   }
 
@@ -70,6 +76,7 @@ export class AuthService {
     this.accessToken.set(null);
     this.currentUser.set(null);
     localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
   }
 
